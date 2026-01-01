@@ -1,42 +1,32 @@
 package model;
 
 import view.WriteView;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.*;
 
-public class DiaryModel  extends SQLException{
+public class HomeModel  extends SQLException{
     private  int id;
-    private String content;
     private String title;
     private String createAt;
     private String updateAt;
-    private String backgroudType;
-
-
-
 
     WriteView view = new WriteView();
-        // db connectio
-        String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;"
-                + "databaseName = Dinary;"
-                + "integratedSecurity = true;"
-                + "trustServerCertificate = true";
-        // ===== Kết nối =====
+    // db connectio
+    String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;"
+            + "databaseName = Dinary;"
+            + "integratedSecurity = true;"
+            + "trustServerCertificate = true";
+    // ===== Kết nối =====
 
-    public DiaryModel(){
+    public HomeModel(){
         loadData();
     }
-    public boolean saveDinary(String title, String content) {
-        String sql = "INSERT INTO DinaryDetail(title, content) VALUES (?, ?)";
-
+    public boolean deleteDinary(String title, String content) {
+        String sql = "SELECT * FROM Dinary WHERE id =?";
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, title);   // Lấy title từ tham số Controller truyền sang
-            ps.setString(2, content); // Lấy content từ tham số Controller truyền sang
 
             int row = ps.executeUpdate();
             return row > 0; // Trả về true nếu lưu thành công

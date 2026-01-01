@@ -206,19 +206,21 @@ public class WriteView extends JFrame {
                 BorderFactory.createLineBorder(new Color(230, 220, 200), 1), // Viền ngoài
                 BorderFactory.createEmptyBorder(20, 40, 20, 40) // Padding bên trong giấy (để chữ không sát mép)
         ));
-        txtHeader = new JTextField("Tiêu Đề");
+
+        txtHeader = new JTextField();
         txtHeader.setFont(new Font("Arial", Font.BOLD, 20));
         txtHeader.setBorder(null);
         txtHeader.setOpaque(false);
+        pPaper.add(txtHeader);
 
         Color mauDongKe = new Color(208, 158, 115, 80);
         // Khởi tạo txtArea bằng class RuledTextArea vừa thêm ở Bước 1
-        txtArea = new RuledTextArea("Nội dung nhật ký hôm nay...", mauDongKe);
+        txtArea = new RuledTextArea(" nd ",mauDongKe);
         txtArea.setLineWrap(true);
         txtArea.setWrapStyleWord(true);
         // Set khoảng cách đệm (Padding)
         txtArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
+        pPaper.add(txtArea);
 
         JScrollPane scrollPane = new JScrollPane(txtArea);
         scrollPane.setBorder(null);
