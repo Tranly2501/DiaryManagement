@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 
@@ -18,6 +20,11 @@ public class WriteView extends JFrame {
 
     JTextArea txtArea;
     JTextField txtHeader;
+
+    JButton btnLuu;
+    JButton btnHuy;
+
+    String dateToday;
 
 
     public WriteView() {
@@ -31,7 +38,7 @@ public class WriteView extends JFrame {
         add(taoVungChinh(), BorderLayout.CENTER);
 
         // tọa Icon cho thanh tiêu đề cửa sổ
-        thietLapIconCuaSo();
+//        thietLapIconCuaSo();
     }
 
 
@@ -51,30 +58,46 @@ public class WriteView extends JFrame {
         JPanel pRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
         pRight.setOpaque(false);
 
-        JButton btnHuy = taoNutHeader("Hủy");
-        JButton btnLuu = taoNutHeader("Lưu");
+        btnHuy =new JButton("Huỷ");
+        btnHuy.setBackground(mauCam);
+        btnHuy.setForeground(Color.WHITE);
+        btnHuy.setFocusPainted(false);
+        btnHuy.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+
+        btnLuu = new JButton ("Lưu");
+        btnLuu.setBackground(mauCam);
+        btnLuu.setForeground(Color.WHITE);
+        btnLuu.setFocusPainted(false);
+        btnLuu.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+
+
         JLabel btnMenu = new JLabel(layIcon("/logo/Menu.png", 25, 25));
         btnMenu.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    // chuyển trang lưu  xong chuyển về trang MainView
 
-        btnHuy.addActionListener(e -> quayVeTrangChinh());
-        btnLuu.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Đã lưu thành công nhật ký!");
-            quayVeTrangChinh();
-        });
-     // chức năng click chuột vào nenu để hiển thị đăng xuất
-        btnMenu.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) { hienThiMenuLogout(btnMenu); }
-        });
-
-        pRight.add(btnHuy); pRight.add(btnLuu); pRight.add(btnMenu);
+        pRight.add(btnHuy); pRight.add(btnLuu);
         pHeader.add(pLeft, BorderLayout.WEST);
         pHeader.add(pRight, BorderLayout.EAST);
         return pHeader;
     }
+    // laay gia btn de controller
+    public JButton getBtnHuy() {
+        return btnHuy;
+    }
 
-    private JPanel taoVungChinh() {
+    public JButton getBtnLuu() {
+        return btnLuu;
+    }
+
+
+    public Color getMauCam() {
+        return mauCam;
+    }
+
+    public String getDateToday() {
+        return dateToday;
+    }
+
+    public JPanel taoVungChinh() {
         JPanel pMain = new JPanel(new BorderLayout(0, 10));
         pMain.setBackground(Color.WHITE);
         pMain.setBorder(BorderFactory.createEmptyBorder(20, 50, 30, 50));
@@ -90,14 +113,21 @@ public class WriteView extends JFrame {
         // Bảng công cụ  ngày ; biểu cảm ;màu ;FONT ;picture.
         JPanel pTools = new JPanel(new BorderLayout());
         pTools.setOpaque(false);
+        pTools.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(240,240,240)));
 
-        JSpinner dateSpinner = new JSpinner(new SpinnerDateModel());
-        dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yy"));
-        dateSpinner.setPreferredSize(new Dimension(120, 30));
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter dinhDang = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        dateToday = date.format(dinhDang);
+        // 1. Tạo JLabel để chứa chuỗi ngày
+        JLabel lblDate = new JLabel("Ngày viết: " + dateToday);
+        // 2. Trang trí cho ngày (Font, màu sắc) cho đồng bộ
+        lblDate.setFont(new Font("Serif", Font.ITALIC, 16));
+        lblDate.setForeground(mauCam);
+        lblDate.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        pTools.add(lblDate, BorderLayout.WEST);
 
-        JPanel pIcons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        JPanel pIcons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         pIcons.setOpaque(false);
-
         JLabel isEmoji = taoLabelIcon("/logo/Face.png", "Chọn biểu cảm");
         JLabel isColor = taoLabelIcon("/logo/Paint Palette.png", "Chọn bảng màu");
         JLabel isFont = taoLabelIcon("/logo/Font.png", "Chỉnh phông chữ");
@@ -112,6 +142,7 @@ public class WriteView extends JFrame {
                 if(choice != null) txtArea.append(" [" + choice.split(" ")[1] + "] ");
             }
         });
+
 
         //  Chonj màu chỉ hiển thị màu RGB
         isColor.addMouseListener(new MouseAdapter() {
@@ -142,6 +173,7 @@ public class WriteView extends JFrame {
         });
 
         // chọn FONT
+
         isFont.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
@@ -165,29 +197,34 @@ public class WriteView extends JFrame {
         });
 
         pIcons.add(isEmoji); pIcons.add(isColor); pIcons.add(isFont); pIcons.add(isImage);
-        pTools.add(dateSpinner, BorderLayout.WEST);
         pTools.add(pIcons, BorderLayout.EAST);
 
         // phần nội dung cần viết
         JPanel pPaper = new JPanel(new BorderLayout());
         pPaper.setBackground(mauNenNoidung);
-        pPaper.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-
+        pPaper.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(230, 220, 200), 1), // Viền ngoài
+                BorderFactory.createEmptyBorder(20, 40, 20, 40) // Padding bên trong giấy (để chữ không sát mép)
+        ));
         txtHeader = new JTextField("Tiêu Đề");
         txtHeader.setFont(new Font("Arial", Font.BOLD, 20));
         txtHeader.setBorder(null);
         txtHeader.setOpaque(false);
 
-        txtArea = new JTextArea("Nội dung của bạn.......");
-        txtArea.setFont(new Font("Arial", Font.PLAIN, 16));
+        Color mauDongKe = new Color(208, 158, 115, 80);
+        // Khởi tạo txtArea bằng class RuledTextArea vừa thêm ở Bước 1
+        txtArea = new RuledTextArea("Nội dung nhật ký hôm nay...", mauDongKe);
         txtArea.setLineWrap(true);
         txtArea.setWrapStyleWord(true);
-        txtArea.setOpaque(false);
+        // Set khoảng cách đệm (Padding)
+        txtArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
 
         JScrollPane scrollPane = new JScrollPane(txtArea);
         scrollPane.setBorder(null);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
+        scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(8, 0)); // Thanh cuộn nhỏ lại cho tinh tế
 
         pPaper.add(txtHeader, BorderLayout.NORTH);
         pPaper.add(scrollPane, BorderLayout.CENTER);
@@ -198,26 +235,41 @@ public class WriteView extends JFrame {
 
         return pMain;
     }
-    // Hàm thiết lập Icon tiêu đề cửa sổ
-    private void thietLapIconCuaSo() {
-        URL url = getClass().getResource("/logo/book.png");
-        if (url != null) {
-            Image iconApp = Toolkit.getDefaultToolkit().createImage(url);
-            this.setIconImage(iconApp);
-        }
+
+    public String getTxtArea() {
+        return txtArea.getText();
     }
-    private void hienThiMenuLogout(JLabel parent) {
-        JPopupMenu menu = new JPopupMenu();
-        JMenuItem itemLogout = new JMenuItem("Đăng xuất");
-        itemLogout.addActionListener(e -> {
-            if (JOptionPane.showConfirmDialog(this, "Bạn có muốn đăng xuất?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                new view.LoginView();
-                this.dispose();
-            }
-        });
-        menu.add(itemLogout);
-        menu.show(parent, 0, parent.getHeight());
+    public void setTxtArea (String content){
+        txtArea.setText(content);
     }
+
+    public String getTxtHeader() {
+        return txtHeader.getText();
+    }
+    public  void setTxtHeader(String title) {
+        txtHeader.setText(title);
+    }
+
+//    // Hàm thiết lập Icon tiêu đề cửa sổ
+//    private void thietLapIconCuaSo() {
+//        URL url = getClass().getResource("/logo/book.png");
+//        if (url != null) {
+//            Image iconApp = Toolkit.getDefaultToolkit().createImage(url);
+//            this.setIconImage(iconApp);
+//        }
+//    }
+//    private void hienThiMenuLogout(JLabel parent) {
+//        JPopupMenu menu = new JPopupMenu();
+//        JMenuItem itemLogout = new JMenuItem("Đăng xuất");
+//        itemLogout.addActionListener(e -> {
+//            if (JOptionPane.showConfirmDialog(this, "Bạn có muốn đăng xuất?", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+//                new view.LoginView();
+//                this.dispose();
+//            }
+//        });
+//        menu.add(itemLogout);
+//        menu.show(parent, 0, parent.getHeight());
+//    }
 
     private JLabel taoLabelIcon(String path, String tooltip) {
         JLabel label = new JLabel(layIcon(path, 25, 25));
@@ -226,14 +278,8 @@ public class WriteView extends JFrame {
         return label;
     }
 
-    private JButton taoNutHeader(String text) {
-        JButton btn = new JButton(text);
-        btn.setBackground(mauCam);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        return btn;
-    }
+
+
 
     private void quayVeTrangChinh() {
         new view.MainView().setVisible(true);
@@ -248,7 +294,33 @@ public class WriteView extends JFrame {
         return null;
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new WriteView().setVisible(true));
+    private static class RuledTextArea extends JTextArea {
+        private Color lineColor;
+
+        public RuledTextArea(String text, Color lineColor) {
+            super(text);
+            this.lineColor = lineColor;
+            setOpaque(false); // Để hiện nền của panel cha
+            setFont(new Font("Serif", Font.PLAIN, 18)); // Font chữ to rõ ràng hơn
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(lineColor);
+
+            int rowHeight = getRowHeight();
+            if (rowHeight == 0) rowHeight = 20;
+
+            // Vẽ dòng kẻ ngang
+            int height = getHeight();
+
+            // Vẽ dòng kẻ dựa trên chiều cao dòng
+            for (int y = rowHeight; y < height; y += rowHeight) {
+                g2.drawLine(5, y + 4, getWidth() - 5, y + 4);
+            }
+        }
     }
 }

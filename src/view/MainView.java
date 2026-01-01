@@ -96,10 +96,13 @@ public class MainView extends JFrame {
 
         JLabel lblAvatar = new JLabel(layIcon("/logo/People.png", 80, 80));
         lblAvatar.setAlignmentX(Component.CENTER_ALIGNMENT);//Căn giữa ngang trong BoxLayout
+
+        // tên người dùng
         JLabel lblUser = new JLabel("Username1");
         lblUser.setForeground(mauCam);
         lblUser.setFont(new Font("Arial", Font.BOLD, 16));
         lblUser.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         // thêm vào panel
         pnlTrai.add(lblAvatar);
         pnlTrai.add(Box.createVerticalStrut(10));// kcachs avatar và username
@@ -135,11 +138,18 @@ public class MainView extends JFrame {
             public void mouseExited(MouseEvent e) { btn.setForeground(Color.BLACK); }
         });
 
+        // xử lý note xóa
         btn.addActionListener(e -> {
             switch (actionCommand) { // giả lập xử lí sự kiện = text
-                case "ACTION_XOA": JOptionPane.showMessageDialog(this, "Bạn vừa bấm Xóa nhật ký!"); break;
-                case "ACTION_SUA": JOptionPane.showMessageDialog(this, "Bạn vừa bấm Sửa nhật ký!"); break;
-                case "ACTION_XUAT": JOptionPane.showMessageDialog(this, "Đang xuất file..."); break;
+                case "ACTION_XOA":
+                    JOptionPane.showMessageDialog(this, "Bạn vừa bấm Xóa nhật ký!");
+                    break;
+                case "ACTION_SUA":
+                    JOptionPane.showMessageDialog(this, "Bạn vừa bấm Sửa nhật ký!");
+                break;
+                case "ACTION_XUAT":
+                    JOptionPane.showMessageDialog(this, "Đang xuất file...");
+                    break;
                 case "ACTION_LOGOUT":
                     // JOptionPane.YES_NO_OPTION sẽ chỉ hiển thị 2 nút Yes và No
                     int opt = JOptionPane.showConfirmDialog(
@@ -168,6 +178,8 @@ public class MainView extends JFrame {
             this.setIconImage(iconApp);
         }
     }
+
+    // Vùng nội dung chính
     private JScrollPane taoVungNoiDung() {
         JPanel pnlList = new JPanel();
         pnlList.setLayout(new BoxLayout(pnlList, BoxLayout.Y_AXIS));
@@ -185,7 +197,8 @@ public class MainView extends JFrame {
         return scroll;
     }
 
-    private JPanel taoTheNhatKy(String date, String title, String content) {
+    // giao diện tóm tắt của 1 nhật ký
+    public  JPanel taoTheNhatKy(String date, String title, String content) {
         JPanel card = new JPanel(new BorderLayout(10, 5));
         card.setBackground(mauTheNhatKy);
         card.setMaximumSize(new Dimension(600, 120));
@@ -201,9 +214,13 @@ public class MainView extends JFrame {
         card.add(lblTitle, BorderLayout.CENTER);
         card.add(lblContent, BorderLayout.SOUTH);
 
+
         return card;
     }
 
+
+
+    //
     private ImageIcon layIcon(String path, int w, int h) {
         try {
             URL res = getClass().getResource(path);
