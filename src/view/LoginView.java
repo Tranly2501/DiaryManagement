@@ -79,7 +79,7 @@ public class LoginView extends JFrame {
         //  chuyển trang đăng nhập -> sang trang Chính
         btnLogin.addActionListener(e -> {
 
-            new view.MainView().setVisible(true);
+            new view.HomeView().setVisible(true);
             this.dispose();
         });
 

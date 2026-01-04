@@ -1,18 +1,22 @@
 package main;
 
-import controller.WriteController;
-import model.DiaryModel;
-import view.WriteView;
-
+import controller.HomeController;
+import view.HomeView;
 import javax.swing.*;
 
 public class MainApp {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater( () ->{
-            WriteView writeView = new WriteView();
-            new WriteController(writeView);
-            writeView.setVisible(true);
+
+        // 2. Khởi chạy ứng dụng trên luồng sự kiện (Chuẩn Java Swing)
+        SwingUtilities.invokeLater(() -> {
+            // Tạo giao diện trang chủ (nhưng chưa hiện)
+            HomeView view = new HomeView();
+
+            // Kích hoạt Controller để xử lý logic và load dữ liệu
+            new HomeController(view);
+
+            // : Hiển thị lên màn hình
+            view.setVisible(true);
         });
     }
-
 }

@@ -55,7 +55,7 @@ public class Signup extends JFrame {
      // chuyển trang  đăng ký xong -> Mở trang chính
         btnDangKy.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
-            new MainView().setVisible(true);
+            new HomeView().setVisible(true);
             this.dispose();
         });
 
