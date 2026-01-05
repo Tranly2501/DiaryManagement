@@ -6,6 +6,7 @@ import view.WriteView;
 import javax.swing.*;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -90,21 +91,22 @@ public class WriteController {
     }
 
     public void chonAnh(){
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Chọn ảnh đính kèm");
+        //Khởi tạo FileDialog (Thay vì JFileChooser)
+        // Tham số: (JFrame cha, Tiêu đề, Chế độ: LOAD để mở file / SAVE để lưu)
+        FileDialog fd = new FileDialog(write, "Chọn ảnh đính kèm", FileDialog.LOAD);
 
-        // chỉ cho phép chọn ảnh
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Hình ảnh (JPG, PNG)", "jpg", "png", "jpeg");
-        fileChooser.setFileFilter(filter);
+        fd.setFile("*.jpg;*.jpeg;*.png;*.gif");
+        //Hiển thị cửa sổ (
+        fd.setVisible(true);
+        //Lấy kết quả
+        String fileName = fd.getFile(); // Lấy tên file (ví dụ: anh.jpg)
+        String directory = fd.getDirectory(); // Lấy đường dẫn thư mục (ví dụ: C:\Users\Desktop\)
 
-        int userSelection = fileChooser.showOpenDialog(write);
-
-        if ( userSelection == JFileChooser.APPROVE_OPTION){
-            File fileToSave = fileChooser.getSelectedFile();
-            String path = fileToSave.getAbsolutePath();
-//            write.hienThiAnh(path);
-            write.themAnhVaoGiay(path);
-            System.out.println("Đã chọn file: " + path);
+        if (fileName != null) {
+            String fullPath = directory + fileName; // Ghép lại thành đường dẫn đầy đủ
+            System.out.println("Bạn đã chọn: " + fullPath);
+            // Gọi hàm hiển thị ảnh bên View
+            write.themAnhVaoGiay(fullPath);
         }
     }
 }

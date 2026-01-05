@@ -2,7 +2,6 @@ package view;
 
 import javax.swing.*;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -242,31 +241,6 @@ public class WriteView extends JFrame {
 
     public JLabel getBtnChonAnh() {
         return btnChonAnh;
-    }
-    // Hiện thị ảnh lên view
-    public void  hienThiAnh(String path) {
-        if ( path != null && !path.isEmpty()) {
-            this.duongDanAnh = path;
-
-            // xử lý réize ảnh cho vừa khung
-            ImageIcon icon = new ImageIcon(path);
-            int width = pnlEditor.getWidth() - 100; // Trừ lề 2 bên
-            if (width <= 0) width = 600; // Kích thước mặc định nếu chưa render xong
-
-            // Giữ nguyên tỷ lệ ảnh
-            Image img = icon.getImage();
-            int newHeight = (img.getHeight(null) * width) / img.getWidth(null);
-
-            // Giới hạn chiều cao tối đa (ví dụ 300px)
-            if(newHeight > 300) {
-                newHeight = 300;
-                width = (img.getWidth(null) * newHeight) / img.getHeight(null);
-            }
-
-            Image scaledImg = img.getScaledInstance(width, newHeight, Image.SCALE_SMOOTH);
-            lblAnhDinhKem.setIcon(new ImageIcon(scaledImg));
-            lblAnhDinhKem.setText(""); // Xóa chữ nếu có
-        }
     }
 
     public void themAnhVaoGiay(String path) {
