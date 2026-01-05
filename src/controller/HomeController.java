@@ -15,14 +15,11 @@ public class HomeController {
 
     public HomeController(HomeView view) {
         this.homeView = view;
-        this.homeModel = new HomeModel();
-
         loadData();
-
         view.getBtnNew().addActionListener(e -> {
             view.dispose();
             WriteView writeView = new WriteView();
-            new WriteController(writeView, view);
+            //new WriteController(writeView, view);
             writeView.setVisible(true);
         });
     }

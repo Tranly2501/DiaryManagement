@@ -13,6 +13,7 @@ public class LoginView extends JFrame {
     private JButton btnReg;
     private JTextField txtUser;
     private JPasswordField txtPass;
+
     public LoginView() {
         // kích thước của cửa sổ  900x500
         setTitle("Dinary - Login");
@@ -110,13 +111,31 @@ public class LoginView extends JFrame {
         return l;
     }
 
+//    private JTextField taoOnhap(String fieldName, Color bg, boolean laMatKhau) {
+//        JTextField t = laMatKhau ? new JPasswordField() : new JTextField();
+//        t.setBackground(bg);
+//        t.setPreferredSize(new Dimension(300, 35));
+//        t.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+//        if (laMatKhau) ((JPasswordField)t).setEchoChar('•'); // Ẩn mật khẩu
+//        return t;
+//    }
+
     private JTextField taoOnhap(String fieldName, Color bg, boolean laMatKhau) {
-        JTextField t = laMatKhau ? new JPasswordField() : new JTextField();
-        t.setBackground(bg);
-        t.setPreferredSize(new Dimension(300, 35));
-        t.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-        if (laMatKhau) ((JPasswordField)t).setEchoChar('•'); // Ẩn mật khẩu
-        return t;
+        JTextField field;
+        if (laMatKhau) {
+            field = new JPasswordField();
+            ((JPasswordField) field).setEchoChar('•');
+            txtPass = (JPasswordField) field;
+        } else {
+            field = new JTextField();
+            txtUser = field;
+        }
+
+        field.setBackground(bg);
+        field.setPreferredSize(new Dimension(300, 35));
+        field.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+
+        return field;
     }
     public JTextField getTxtUser() { return txtUser; }
     public JPasswordField getTxtPass() { return txtPass; }

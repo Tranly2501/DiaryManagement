@@ -20,20 +20,24 @@ public class LoginController {
     }
 
     private void inController() {
-        username = view.getTxtUser().getText();
-        password = new String(view.getTxtPass().getText());
-
         //  đăng nhập và chuyển trang nếu thành công
         view.getBtnLogin().addActionListener(e -> {
-            if(username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!", "message", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            if (model.logIn(username, password)){
-                JOptionPane.showMessageDialog(null, "Đăng nhập thành công!", "message", JOptionPane.INFORMATION_MESSAGE);
-                new HomeView().setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(null, "Đăng nhập thành công!",  "message", JOptionPane.WARNING_MESSAGE);
+            username = view.getTxtUser().getText();
+            password = new String(view.getTxtPass().getPassword());
+
+            try {
+                if (username.trim().isEmpty() || password.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!", "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                } else if (model.logIn(username, password)) {
+                    JOptionPane.showMessageDialog(null, "Đăng nhập thành công!", "Message", JOptionPane.INFORMATION_MESSAGE);
+                    new HomeView().setVisible(true);
+                    view.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu không hợp lệ", "Message", JOptionPane.WARNING_MESSAGE);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
         // bấm đăng ký -> sang trang Signup

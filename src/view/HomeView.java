@@ -1,5 +1,8 @@
 package view;
 
+import controller.HomeController;
+import model.HomeModel;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;

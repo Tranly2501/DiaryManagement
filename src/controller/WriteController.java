@@ -1,6 +1,7 @@
 package controller;
 
 import model.DiaryModel;
+import model.HomeModel;
 import view.HomeView;
 import view.WriteView;
 import javax.swing.*;
