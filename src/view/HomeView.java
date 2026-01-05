@@ -15,6 +15,10 @@ public class HomeView extends JFrame {
 
     private JButton btnXoa, btnSua, btnXuat, btnDangXuat;
 
+    private int selectedId = -1; // biến theo dỗi thẻ đang chọn , -1 nghĩa là chưa chọn j
+    private  JPanel selectedPanel = null; //lưu panel đang được highlight
+
+
     // --- BẢNG MÀU ---
     Color mauCam = new Color(232, 145, 82);
     Color mauNenTren = new Color(255, 255, 255);
@@ -177,8 +181,8 @@ public class HomeView extends JFrame {
 
     // --- CÁC HÀM GIAO TIẾP VỚI CONTROLLER ---
 
-    public void themNhatKyVaoList(String title, String day, String month, String preview) {
-        JPanel card = taoTheNhatKy(title, day, month, preview);
+    public void themNhatKyVaoList(int id, String title, String day, String month, String preview) {
+        JPanel card = taoTheNhatKy(id, title, day, month, preview);
         pnlList.add(card);
         pnlList.add(Box.createRigidArea(new Dimension(0, 15)));
         pnlList.revalidate();
@@ -191,14 +195,18 @@ public class HomeView extends JFrame {
         pnlList.repaint();
     }
 
+    public int getSelectedId() {
+        return selectedId;
+    }
+
     public JButton getBtnNew() { return btnNew; }
     public JButton getBtnXoa() { return btnXoa; }
     public JButton getBtnSua() { return btnSua; }
     public JButton getBtnXuat() { return btnXuat; }
     public JButton getBtnDangXuat() { return btnDangXuat; }
 
-    // --- HÀM TẠO THẺ NHẬT KÝ (View "dumb" - chỉ hiển thị) ---
-    private JPanel taoTheNhatKy(String title, String day, String month, String content) {
+    // --- HÀM TẠO THẺ NHẬT KÝ ( ---
+    private JPanel taoTheNhatKy(int id, String title, String day, String month, String content) {
         JPanel card = new JPanel(new BorderLayout(15, 0));
         card.setBackground(Color.WHITE);
         card.setMaximumSize(new Dimension(2000, 100));
@@ -251,21 +259,52 @@ public class HomeView extends JFrame {
         card.add(pCenter, BorderLayout.CENTER);
         card.add(lblArrow, BorderLayout.EAST);
 
-        // Hover Effect
+        // hiệu ứng khi di vào
         card.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                card.setBackground(new Color(255, 252, 248));
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (selectedPanel != null && selectedPanel != card) {
+                    selectedPanel.setBackground(Color.WHITE);
+                    selectedPanel.setBorder(BorderFactory.createCompoundBorder(
+                            BorderFactory.createLineBorder(new Color(225, 225, 225), 1),
+                            new EmptyBorder(15, 20, 15, 20)
+                    ));
+                }
+
+                // lưu trạng thái thẻ mới
+                selectedId = id; // luư id db vào biến
+                selectedPanel = card;
+
+                // highlight thẻ đang chọn
+                card.setBackground(new Color(255, 248, 240));
                 card.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(mauCam, 1),
+                        BorderFactory.createLineBorder(mauCam, 2),
                         new EmptyBorder(15, 20, 15, 20)
                 ));
             }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                // hiệu ứng khi hover vào
+                if (card != selectedPanel) {
+                    card.setBackground(new Color(255, 252, 248));
+                    card.setBorder(BorderFactory.createCompoundBorder(
+                            BorderFactory.createLineBorder(mauCam, 1),
+                            new EmptyBorder(15, 20, 15, 20)
+                    ));
+                }
+            }
+
+            @Override
             public void mouseExited(MouseEvent e) {
-                card.setBackground(Color.WHITE);
-                card.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(225, 225, 225), 1),
-                        new EmptyBorder(15, 20, 15, 20)
-                ));
+                // Chỉ trả về màu gốc nếu thẻ này KHÔNG PHẢI là thẻ đang chọn
+                if (card != selectedPanel) {
+                    card.setBackground(Color.WHITE);
+                    card.setBorder(BorderFactory.createCompoundBorder(
+                            BorderFactory.createLineBorder(new Color(225, 225, 225), 1),
+                            new EmptyBorder(15, 20, 15, 20)
+                    ));
+                }
             }
         });
 

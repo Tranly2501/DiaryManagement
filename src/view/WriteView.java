@@ -275,6 +275,8 @@ public class WriteView extends JFrame {
         txtHeader.setText(title);
     }
 
+
+
     private JLabel taoLabelIcon(String path, String tooltip) {
         JLabel label = new JLabel(layIcon(path, 25, 25));
         label.setToolTipText(tooltip);

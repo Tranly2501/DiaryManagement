@@ -1,11 +1,10 @@
 package model;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.Date;
+import java.text.SimpleDateFormat;
 public class DiaryModel {
-    // Cấu hình kết nối (Kiểm tra kỹ tên database của bạn là Dinary hay Diary)
+
     private final String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;"
             + "databaseName=Dinary;"
             + "integratedSecurity=true;"
@@ -18,6 +17,10 @@ public class DiaryModel {
      * Thêm mới nhật ký và trả về ID tự tăng từ DB
      */
     public int saveDiary(String title, String content, String createAt) {
+
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+         createAt = sdf.format(now);
         String sql = "INSERT INTO DinaryDetail(title, content, create_at) VALUES (?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -27,12 +30,12 @@ public class DiaryModel {
             ps.setString(2, content);
             ps.setString(3, createAt);
 
-            int affectedRows = ps.executeUpdate();
+            int rowsAffected = ps.executeUpdate();
 
-            if (affectedRows > 0) {
+            if (rowsAffected> 0) {
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    return rs.getInt(1); // Trả về ID vừa sinh ra
+                    return rs.getInt(1);
                 }
             }
         } catch (SQLException ex) {
@@ -44,22 +47,33 @@ public class DiaryModel {
     /**
      * Cập nhật nhật ký dựa trên ID đã có
      */
-    public boolean updateDiary(int id, String title, String content) {
-        String sql = "UPDATE DinaryDetail SET title = ?, content = ? WHERE id = ?";
+    public boolean updateDiary(int id, String title, String content, String updateAt) {
+        String sql = "UPDATE DinaryDetail SET title = ?, content = ?, update_at = ? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, title);
             ps.setString(2, content);
-            ps.setInt(3, id);
 
-            return ps.executeUpdate() > 0;
+            // lấy thời gian ngày update
+            Date now = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String updateTime = sdf.format(now);
+            ps.setString(3, updateTime); // Điền ngày sửa vào dấu ? thứ 3
+
+            ps.setInt(4, id);     // Điền ID vào dấu ? thứ 4
+
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Đang update ID: " + id + " | Ngày: " + updateTime + " | Kết quả: " + (rowsAffected > 0));
+
+            return rowsAffected > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
             return false;
         }
     }
+
 
 
 }

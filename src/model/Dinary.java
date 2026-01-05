@@ -5,14 +5,15 @@ public class Dinary {
     private String title;
     private String content;
     private String createAt;
-
+    private String updateAt;
     public Dinary() {}
 
-    public Dinary(int id, String title, String content, String createAt) {
+    public Dinary(int id, String title, String content, String createAt, String updateAt) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.createAt = createAt;
+        this.updateAt = updateAt;
 
     }
 
@@ -48,11 +49,12 @@ public class Dinary {
         this.title = title;
     }
 
-    // lấy content rút gọn để hiện thị preview ngoài danh sách
-    public String getPreview() {
-        if ( content != null && content.length() >60){
-            return content.substring(0,60)+"...."; /// lấy 0->60 kí tự đầu tiên
-        }
-        return content;
+    public String getUpdateAt() {
+        return updateAt;
     }
+
+    public void setUpdateAt(String updateAt) {
+        this.updateAt = updateAt;
+    }
+
 }

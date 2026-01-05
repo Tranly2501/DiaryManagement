@@ -1,11 +1,14 @@
 package controller;
 
+import model.DiaryModel;
 import model.Dinary;
 import model.HomeModel;
 import view.HomeView;
+import view.MsgBox;
 import view.WriteView;
 
-import java.text.SimpleDateFormat;
+import javax.swing.*;
+import java.text.*;
 import java.util.Date;
 import java.util.List;
 
@@ -20,11 +23,13 @@ public class HomeController {
         loadData();
 
         view.getBtnNew().addActionListener(e -> {
-            view.dispose();
+            view.setVisible(false);
             WriteView writeView = new WriteView();
             new WriteController(writeView, view);
             writeView.setVisible(true);
         });
+        view.getBtnXoa().addActionListener(e -> xoa());
+        view.getBtnSua().addActionListener(e -> sua());
     }
 
     private void loadData() {
@@ -35,49 +40,38 @@ public class HomeController {
     private void hienThiLenView(List<Dinary> list) {
         homeView.clearList(); // Xóa list cũ
 
-        // Dạng đầy đủ (nếu DB trả về timestamp): 2026-01-01 14:30:00
-        SimpleDateFormat inputFull = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        // Dạng ngắn (nếu DB trả về date): 2026-01-01
-        SimpleDateFormat inputShort = new SimpleDateFormat("yyyy-MM-dd");
-
-        // định dạng đầu ra (Output) để hiển thị lên View
-        SimpleDateFormat dayFormat = new SimpleDateFormat("dd"); // Lấy ngày (01)
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MM"); // Lấy tháng (01)
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd"); // Bộ đọc
+        SimpleDateFormat dayFormat = new SimpleDateFormat("dd");      // Bộ xuất ngày
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MM");    // Bộ xuất tháng
 
         for (Dinary nk : list) {
-            String rawDate = nk.getCreateAt(); // Ví dụ: "2026-01-01"
+            // Ưu tiên lấy ngày sửa, nếu không có thì lấy ngày tạo
+            String rawDate = nk.getUpdateAt();
+            if (rawDate == null || rawDate.isEmpty()) {
+                rawDate = nk.getCreateAt();
+            }
             String dayDisplay = "01";
             String monthDisplay = "01";
-
-            // xử lý date
+            //  Xử lý date a
             try {
                 if (rawDate != null && !rawDate.isEmpty()) {
-                    Date date = null;
-
-                    // Kiểm tra độ dài chuỗi để chọn bộ format đúng
+                    // QUAN TRỌNG: Nếu chuỗi dài quá 10 ký tự (có giờ phút), cắt bớt đi
+                    // Ví dụ: "2026-01-05 14:00:00" -> Cắt thành "2026-01-05"
                     if (rawDate.length() > 10) {
-                        // Nếu chuỗi dài (có giờ phút) -> dùng inputFull
-                        date = inputFull.parse(rawDate);
-                    } else {
-                        // Nếu chuỗi ngắn (chỉ có ngày) -> dùng inputShort
-                        date = inputShort.parse(rawDate);
+                        rawDate = rawDate.substring(0, 10);
                     }
 
-                    // Format ra ngày và tháng để hiển thị
+                    Date date = parser.parse(rawDate);
+                    // Format ra ngày và tháng
                     dayDisplay = dayFormat.format(date);
                     monthDisplay = monthFormat.format(date);
 
-                    // format
-                    String temp = dayDisplay;
-                    dayDisplay = monthDisplay;
-                    monthDisplay = temp;
                 }
             } catch (Exception e) {
-                // Nếu vẫn lỗi thì in ra console để kiểm tra, nhưng không làm crash app
-                System.out.println("Lỗi parse ngày: " + rawDate + " | Chi tiết: " + e.getMessage());
+                System.out.println("Lỗi parse ngày ID " + nk.getId() + ": " + rawDate);
             }
 
-            // --- XỬ LÝ PREVIEW ---
+            // 3. Xử lý Preview nội dung
             String preview = nk.getContent();
             if (preview != null && preview.length() > 50) {
                 preview = preview.substring(0, 50) + "...";
@@ -85,7 +79,48 @@ public class HomeController {
                 preview = "";
             }
             // Đẩy dữ liệu ra View
-            homeView.themNhatKyVaoList(nk.getTitle(), dayDisplay, monthDisplay, preview);
+            homeView.themNhatKyVaoList(nk.getId(), nk.getTitle(), dayDisplay, monthDisplay, preview);
+        }
+    }
+
+    private void xoa(){
+        int idCanXoa = homeView.getSelectedId();
+        if (idCanXoa == -1){
+            MsgBox.show(homeView, "Vui lòng chọn nhật ký cần xóa!", "Nhắc nhở");
+            return;
+        }
+
+        boolean confirm = MsgBox.confirm(homeView, "Bạn có chắc chắn muốn xóa nhật ký này không?");
+        if (confirm) {
+            boolean isDeleted = homeModel.deleteDiary(idCanXoa);
+
+            if (isDeleted) {
+                MsgBox.show(homeView, "Đã xóa thành công!", "Thông báo");
+                loadData(); // Load lại danh sách
+            } else {
+                MsgBox.show(homeView, "Xóa thất bại. Vui lòng thử lại.", "Lỗi");
+            }
+        }
+    }
+
+    private void sua(){
+        int id = homeView.getSelectedId();
+
+        if ( id == -1) {
+            MsgBox.show(homeView, "Vui lòng chọn bài viết cần sửa!", " ! Nhắc nhở");
+            return;
+        }
+
+        // lấy dữ liệu chi tiết từ model
+        Dinary oldDiary = homeModel.getDiaryById(id);
+        if (oldDiary != null) {
+            homeView.dispose();
+            WriteView writeView = new WriteView();
+            new WriteController(writeView, homeView, oldDiary);
+
+            writeView.setVisible(true);
+        } else {
+            MsgBox.show(homeView, "Không tìm thấy dữ liệu!", "Lỗi");
         }
     }
 }

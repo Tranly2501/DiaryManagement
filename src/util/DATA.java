@@ -1,8 +1,10 @@
+package util;
+
 import java.time.Instant ;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-public class VD {
+public class DATA {
     public static void main(String[] args) {
         Instant nowUtc = Instant.now();
         ZoneId userZone = ZoneId.systemDefault();
