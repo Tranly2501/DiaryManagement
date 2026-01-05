@@ -68,7 +68,7 @@ public class HomeView extends JFrame {
         pTimKiem.setPreferredSize(new Dimension(400, 40));
 
         JLabel lblIconSearch = new JLabel(layIcon("/logo/Search.png", 18, 18));
-        txtSearch = new JTextField(" Tìm kiếm nhật ký...");
+        txtSearch = new JTextField(" ");
         txtSearch.setBackground(new Color(245, 245, 245));
         txtSearch.setBorder(null);
         txtSearch.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -93,6 +93,10 @@ public class HomeView extends JFrame {
         pTren.add(btnNew, gbc);
 
         return pTren;
+    }
+
+    public JTextField getTxtSearch() {
+        return txtSearch;
     }
 
     // --- PHẦN 2: SIDEBAR ---
@@ -166,7 +170,7 @@ public class HomeView extends JFrame {
         return btn;
     }
 
-    // --- PHẦN 3: LIST DATA ---
+    // --- LIST DATA ---
     private JScrollPane taoVungNoiDung() {
         pnlList = new JPanel();
         pnlList.setLayout(new BoxLayout(pnlList, BoxLayout.Y_AXIS));

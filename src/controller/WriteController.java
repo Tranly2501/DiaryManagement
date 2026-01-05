@@ -8,6 +8,9 @@ import javax.swing.*;
 import java.awt.FileDialog;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import view.MsgBox;
 
 
@@ -17,12 +20,17 @@ public class WriteController {
     private DiaryModel diaryModel;
     private int currentId = -1; // -1 : thêm mơi, >0 : sửa
 
+    private  Thread autoSave;
+    private volatile  boolean isRunning = true; // biến kiểu xóa ( volatile để đồng bộ giữa các luồng)
+
     // thêm mới nhật ký
     public WriteController(WriteView write, HomeView homeView) {
         this.write = write;
         this.homeView = homeView; // Lúc này biến homeView mới có dữ liệu thật
         this.diaryModel = new DiaryModel();
         intController();
+
+        startAutoSave();
     }
 
     // sửa nhật ký
@@ -36,22 +44,24 @@ public class WriteController {
         write.setTxtHeader(oldDiary.getTitle());
         write.setTxtArea(oldDiary.getContent());
         intController();
+
+        startAutoSave();
     }
 
     public void intController() {
         // Nút Hủy
-        this.write.getBtnHuy().addActionListener(e -> {
-            this.write.dispose();
-            // Kiểm tra homeView tồn tại thì mới hiện lại
-            if (homeView != null) {
-                homeView.setVisible(true);
-                // Cập nhật lại list data khi quay về
-                new HomeController(homeView);
-            }
-        });
+        this.write.getBtnHuy().addActionListener(e -> closeForm());
 
         // Nút Lưu
-        this.write.getBtnLuu().addActionListener(e -> save());
+        this.write.getBtnLuu().addActionListener(e -> save(true));
+
+        // Xử lý khi bấm nút X trên cửa sổ -> Phải dừng Thread
+        this.write.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeForm();
+            }
+        });
 
         // chọn ảnh
         this.write.getBtnChonAnh().addMouseListener(new MouseAdapter() {
@@ -62,42 +72,85 @@ public class WriteController {
         });
     }
 
-    public void save() {
+    private void startAutoSave(){
+        autoSave = new Thread( () -> {
+            while (isRunning) {
+                try {
+
+                    Thread.sleep(10000);
+
+                    // kiểm tra biến
+                    if (!isRunning) break;
+                    // Gọi hàm lưu . Dùng SwingUtilities.invokeLater để cập nhật UI an toàn từ luồng khác
+                    SwingUtilities.invokeLater( () ->{
+                        // Chỉ lưu nếu tiêu đề và nội dung không rỗng
+                        if (!write.getTxtHeader().isEmpty() && !write.getTxtHeader().equals("Tiêu Đề Nhật Ký...")) {
+                            save(false);
+                            System.out.println("Auto Save: Đã tự động lưu lúc " + new java.util.Date());
+                        }
+                    });
+                }catch (InterruptedException e){
+                    // luồng ngăt, thoát vòng lăp
+                    break;
+                }
+            }
+
+        });
+        // đặt tên luông
+        autoSave.setName(" AutoSave thread");
+        // cho chạy ngầm
+        autoSave.start();
+    }
+
+
+
+    private void closeForm() {
+        isRunning = false; // Ngắt vòng lặp Auto Save
+        if (autoSave!= null) {
+            autoSave.interrupt(); // Đánh thức luồng nếu nó đang ngủ
+        }
+        write.dispose();
+        if (homeView != null) {
+            homeView.setVisible(true);
+            new HomeController(homeView);
+        }
+    }
+
+    public void save(boolean showMessage) {
         String tieuDe = write.getTxtHeader();
         String noiDung = write.getTxtArea();
         String ngayViet = write.getDateToday();
 
 
-        if(tieuDe.isEmpty() || noiDung.isEmpty() || tieuDe.equals("Tiêu Đề Nhật Ký...")) {
+        if (tieuDe.isEmpty() || noiDung.isEmpty() || tieuDe.equals("Tiêu Đề Nhật Ký...")) {
             MsgBox.show(write, "Bạn chưa nhập tiêu đề cho nhật ký!", "Nhắc nhở");
             return;
         }
 
         boolean isSuccess = false;
         //xử lý db
-        if ( currentId == -1){
+        if (currentId == -1) {
             // thêm mới
             int newId = diaryModel.saveDiary(tieuDe, noiDung, "");
             if (newId != -1) {
                 this.currentId = newId;
                 isSuccess = true;
             }
-            MsgBox.show(write, "Đã lưu nhật ký thành công!", "Thông báo");
         } else {
             // cập nhập sau khi sửa nhật kí
-            isSuccess = diaryModel.updateDiary( currentId, tieuDe, noiDung,ngayViet);
-            if (isSuccess) {
-                MsgBox.show(write, "Đã cập nhập thành công!", "Thông báo");
-            }
+            isSuccess = diaryModel.updateDiary(currentId, tieuDe, noiDung, ngayViet);
         }
-        if ( isSuccess) {
-            write.dispose();
-            if (homeView != null) {
-                homeView.setVisible(true);
-                new HomeController(homeView);
+
+        // chỉ hiện thông khi người dùng bấm nút lưu
+        if (showMessage) {
+            if (isSuccess) {
+                MsgBox.show(write, "Đã lưu nhật ký thành công!", "Thông báo");
+                closeForm();
+            } else {
+                MsgBox.show(write, "Lưu thất bại! Vui lòng thử lại.", "Lỗi hệ thống");
             }
         } else {
-            MsgBox.show(write, "Lưu thất bại! Vui lòng thử lại.", "Lỗi hệ thống");
+            if (isSuccess) write.setTitle("Viết Nhật Ký (Đã lưu tự động...)");
         }
     }
 
@@ -125,4 +178,6 @@ public class WriteController {
             write.themAnhVaoGiay(fullPath);
         }
     }
+
+
 }

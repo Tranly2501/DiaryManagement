@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.text.*;
 import java.util.Date;
 import java.util.List;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class HomeController {
     private HomeView homeView;
@@ -30,6 +32,12 @@ public class HomeController {
         });
         view.getBtnXoa().addActionListener(e -> xoa());
         view.getBtnSua().addActionListener(e -> sua());
+        view.getTxtSearch().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                xuLyTimKiem();
+            }
+        });
     }
 
     private void loadData() {
@@ -107,7 +115,7 @@ public class HomeController {
         int id = homeView.getSelectedId();
 
         if ( id == -1) {
-            MsgBox.show(homeView, "Vui lòng chọn bài viết cần sửa!", " ! Nhắc nhở");
+            JOptionPane.showMessageDialog(homeView, "Vui lòng chọn bài viết cần sửa!");
             return;
         }
 
@@ -120,7 +128,20 @@ public class HomeController {
 
             writeView.setVisible(true);
         } else {
-            MsgBox.show(homeView, "Không tìm thấy dữ liệu!", "Lỗi");
+            JOptionPane.showMessageDialog(homeView, "Không tìm thấy dữ liệu!");
         }
+    }
+
+    private  void xuLyTimKiem() {
+        String keyWord = homeView.getTxtSearch().getText().trim();
+
+        // gọi model để tìm
+        List<Dinary> list;
+        if ( keyWord.isEmpty()){
+            list = homeModel.getAllDiaries();
+        } else {
+            list = homeModel.searchByTitle(keyWord);
+        }
+        hienThiLenView(list);
     }
 }
