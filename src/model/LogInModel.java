@@ -1,21 +1,13 @@
 package model;
 
-import view.LoginView;
+import controller.LoginController;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.*;
 import javax.swing.*;
 
-public class LogInModel  extends SQLException{
-    private  int id;
-    private String username;
-    private String password;
-    private String email;
-    private String phone;
-
-
-    LoginView view = new LoginView();
+public class LogInModel  {
     // db connectio
     String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;"
             + "databaseName = Dinary;"
@@ -23,33 +15,24 @@ public class LogInModel  extends SQLException{
             + "trustServerCertificate = true";
     // ===== Kết nối =====
 
-//    public DiaryModel(){
-//        loadData();
-//    }
-    public LogInModel() {
+    public LogInModel() { loadData(); }
+    public boolean logIn(String username, String password) {
         String sql = "SELECT * FROM UserInfo WHERE username =? and password =?";
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, username);   // Lấy username từ tham số Controller truyền sang
-            ps.setString(2, password); // Lấy password từ tham số Controller truyền sang
-
-            try ( ResultSet rs = ps.executeQuery()) {
-                if(rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Đăng nhập thành công", "Notification",1);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu không hợp lệ!", "Error", 0);
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+            ps.setString(2, password);  // Lấy password từ tham số Controller truyền sang
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException error) {
+            error.printStackTrace();
+            return false;
         }
     }
-
     public void loadData(){
         try {
             Connection connnect = DriverManager.getConnection(url);
-            System.out.println(" Connect succeslly");
+            System.out.println("Connect succeslly");
         } catch (SQLException e) {
             e.printStackTrace();
         }

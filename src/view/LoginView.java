@@ -1,11 +1,18 @@
 package view;
 
+import controller.LoginController;
+import model.LogInModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 
 
 public class LoginView extends JFrame {
+    private JButton btnLogin;
+    private JButton btnReg;
+    private JTextField txtUser;
+    private JPasswordField txtPass;
 
     public LoginView() {
         // kích thước của cửa sổ  900x500
@@ -65,29 +72,16 @@ public class LoginView extends JFrame {
 
         // Các ô nhập liệu
         gbcR.gridy = 1; pnlRight.add(taoNhan("Tên đăng nhập", mauCam), gbcR);
-        JTextField txtUser = taoOnhap(mauNenOnhap, false);
+        txtUser = taoOnhap("username", mauNenOnhap, false);
         gbcR.gridy = 2; pnlRight.add(txtUser, gbcR);
 
         gbcR.gridy = 3; pnlRight.add(taoNhan("Mật khẩu", mauCam), gbcR);
-        JPasswordField txtPass = (JPasswordField) taoOnhap(mauNenOnhap, true);
+        txtPass = (JPasswordField) taoOnhap("password", mauNenOnhap, true);
         gbcR.gridy = 4; pnlRight.add(txtPass, gbcR);
 
-        // Nút bấm và Chuyển màn hình
-        JButton btnLogin = taoNut("Đăng nhập", mauCam);
-        JButton btnReg = taoNut("Đăng ký", mauCam);
-
-        //  chuyển trang đăng nhập -> sang trang Chính
-        btnLogin.addActionListener(e -> {
-
-            new view.HomeView().setVisible(true);
-            this.dispose();
-        });
-
-        // bấm đăng ký -> sang trang Signup
-        btnReg.addActionListener(e -> {
-            new Signup().setVisible(true);
-            this.dispose();
-        });
+        // Nút bấm
+        btnLogin = taoNut("Đăng nhập", mauCam);
+        btnReg = taoNut("Đăng ký", mauCam);
 
         JPanel pnlBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         pnlBtns.setOpaque(false);
@@ -99,6 +93,8 @@ public class LoginView extends JFrame {
         add(pnlLeft);
         add(pnlRight);
     }
+    public JButton getBtnLogin() { return btnLogin; }
+    public JButton getBtnReg() { return btnReg; }
 
     // Hàm thiết lập Icon tiêu đề cửa sổ
     private void thietLapIconCuaSo() {
@@ -115,14 +111,34 @@ public class LoginView extends JFrame {
         return l;
     }
 
-    private JTextField taoOnhap(Color bg, boolean laMatKhau) {
-        JTextField t = laMatKhau ? new JPasswordField() : new JTextField();
-        t.setBackground(bg);
-        t.setPreferredSize(new Dimension(300, 35));
-        t.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-        if (laMatKhau) ((JPasswordField)t).setEchoChar('•'); // Ẩn mật khẩu
-        return t;
+//    private JTextField taoOnhap(String fieldName, Color bg, boolean laMatKhau) {
+//        JTextField t = laMatKhau ? new JPasswordField() : new JTextField();
+//        t.setBackground(bg);
+//        t.setPreferredSize(new Dimension(300, 35));
+//        t.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+//        if (laMatKhau) ((JPasswordField)t).setEchoChar('•'); // Ẩn mật khẩu
+//        return t;
+//    }
+
+    private JTextField taoOnhap(String fieldName, Color bg, boolean laMatKhau) {
+        JTextField field;
+        if (laMatKhau) {
+            field = new JPasswordField();
+            ((JPasswordField) field).setEchoChar('•');
+            txtPass = (JPasswordField) field;
+        } else {
+            field = new JTextField();
+            txtUser = field;
+        }
+
+        field.setBackground(bg);
+        field.setPreferredSize(new Dimension(300, 35));
+        field.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+
+        return field;
     }
+    public JTextField getTxtUser() { return txtUser; }
+    public JPasswordField getTxtPass() { return txtPass; }
 
     private JButton taoNut(String text, Color bg) {
         JButton b = new JButton(text);
@@ -135,6 +151,11 @@ public class LoginView extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new LoginView().setVisible(true));
+        SwingUtilities.invokeLater(() -> {
+            LoginView loginView = new LoginView();
+            LogInModel logInModel = new LogInModel();
+            new LoginController(loginView, logInModel);
+            loginView.setVisible(true);
+        });
     }
 }
