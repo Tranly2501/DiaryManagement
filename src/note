@@ -1,0 +1,12 @@
+Vai trò từng package như sau:
+1. Model :
+dùng để chứa dữ liệu và nghiệp vụ
+2. view:
+Chứa toàn bộ java swing GUI
+3. controller
+xử lý  sự kiện
+gọi model để xử lý
+cập nhập lại view
+4. util
+các chức năng sử dụng chung, không thược mvc trực tiếp
+ở đây xử lý : ghi/ đọc file ; xử lý ngày ; tự động luuw nhật lkys

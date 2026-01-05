@@ -1,0 +1,35 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+public class FILEEXPORTER {
+   public static void exportWithAppend(String title, String content) {
+       String safeTitle = title.replaceAll("[\\\\/:*?\"<>|]", "_");
+       Path folder = Paths.get("Diary_Files");
+       Path path = folder.resolve(safeTitle + ".txt");
+       try {
+           if (Files.notExists(folder)) {
+               Files.createDirectories(folder);
+           }
+           try (BufferedWriter writer = Files.newBufferedWriter(
+                   path,
+                   StandardCharsets.UTF_8,
+                   StandardOpenOption.CREATE,
+                   StandardOpenOption.APPEND)) {
+               writer.write(content);
+               writer.newLine();
+               System.out.println("Ghi thành công vào: " + path.toAbsolutePath());
+           }
+       } catch (IOException e) {
+           System.err.println("Lỗi hệ thống: " + e.getMessage());
+       }
+   }
+    public static void main(String[] args) {
+        // Chạy thử nhiều lần để thấy Append (viết tiếp) vào file
+        exportWithAppend("Nhat_Ky_Cua_Toi", "Day la noi dung nhat ky ngay hom nay.");
+        exportWithAppend("Nhat_Ky_Cua_Toi", "Day la noi dung tiep theo.");
+    }
+}
