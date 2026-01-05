@@ -12,7 +12,7 @@ public class MainApp {
         // 2. Khởi chạy ứng dụng trên luồng sự kiện (Chuẩn Java Swing)
         SwingUtilities.invokeLater(() -> {
             // Tạo giao diện trang chủ (nhưng chưa hiện)
-            LoginView login = new LoginView();
+
             HomeView view = new HomeView();
 
             // Kích hoạt Controller để xử lý logic và load dữ liệu

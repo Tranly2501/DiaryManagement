@@ -122,11 +122,6 @@ public class WriteController {
         String ngayViet = write.getDateToday();
 
 
-        if (tieuDe.isEmpty() || noiDung.isEmpty() || tieuDe.equals("Tiêu Đề Nhật Ký...")) {
-            MsgBox.show(write, "Bạn chưa nhập tiêu đề cho nhật ký!", "Nhắc nhở");
-            return;
-        }
-
         boolean isSuccess = false;
         //xử lý db
         if (currentId == -1) {
