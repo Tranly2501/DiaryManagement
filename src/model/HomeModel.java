@@ -97,5 +97,33 @@ public class HomeModel {
         return nk;
     }
 
+    public List<Dinary> searchByTitle(String keyWord) {
+        List<Dinary> list = new ArrayList<>();
 
+        String sql = "SELECT * FROM DinaryDetail WHERE title LIKE ? ORDER BY id DESC";
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1,keyWord +"%");
+            try (ResultSet resultSet = ps.executeQuery()) {
+                while (resultSet.next()) {
+                    Dinary nk = new Dinary();
+                    nk.setId(resultSet.getInt("id"));
+                    nk.setTitle(resultSet.getString("title"));
+                    nk.setContent(resultSet.getString("content"));
+
+                    // Lấy các cột ngày tháng giống hệt hàm getAllDiaries
+                    nk.setCreateAt(resultSet.getString("create_at"));
+                    if (resultSet.getString("update_at") != null) {
+                        nk.setUpdateAt(resultSet.getString("update_at"));
+                    }
+
+                    list.add(nk);
+                }
+            }
+
+    } catch (SQLException ex){
+            ex.printStackTrace();
+        }
+    return list;
+}
 }
