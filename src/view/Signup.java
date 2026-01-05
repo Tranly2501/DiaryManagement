@@ -52,7 +52,7 @@ public class Signup extends JFrame {
         JButton btnDangKy = taoNut("Đăng ký", mauCam);
         JButton btnQuayLai = taoNut("Quay Lại", mauCam);
 
-     // chuyển trang  đăng ký xong -> Mở trang chính
+        // chuyển trang  đăng ký xong -> Mở trang chính
         btnDangKy.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
             new HomeView().setVisible(true);
