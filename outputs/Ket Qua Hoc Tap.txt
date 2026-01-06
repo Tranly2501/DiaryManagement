@@ -1,0 +1,2 @@
+Lần 1: Học về Append.
+Lần 2: Học về Path tối ưu.
